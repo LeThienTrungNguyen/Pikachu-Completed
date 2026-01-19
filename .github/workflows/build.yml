@@ -1,5 +1,5 @@
 
-name: Unity Automated Build
+name: Unity Multi-Platform Build
 on: 
   workflow_dispatch:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build & Deploy Pipeline
+    name: Build All Platforms
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -19,11 +19,11 @@ jobs:
         uses: actions/cache@v3
         with:
           path: Library
-          key: Library-build-WebGL
+          key: Library-build-all
           restore-keys: |
             Library-build-
-            Library-
 
+      # 1. Build WebGL (Để chơi trực tiếp trên web)
       - name: Unity Builder (WebGL)
         uses: game-ci/unity-builder@v2
         env:
@@ -32,8 +32,39 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
+          outputPath: build/WebGL
 
-      - name: Deploy to GitHub Pages
+      # 2. Build Windows (Download for PC)
+      - name: Unity Builder (Windows)
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: StandaloneWindows64
+          outputPath: build/StandaloneWindows64
+
+      # 3. Build Android (Download for APK)
+      - name: Unity Builder (Android)
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: Android
+          outputPath: build/Android
+
+      # Upload Artifacts (Lưu trữ file để tải về)
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Game-Builds
+          path: build/
+
+      # Deploy WebGL to GitHub Pages
+      - name: Deploy WebGL
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: build/WebGL
