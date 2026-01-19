@@ -5,6 +5,11 @@ on:
   push:
     branches: [ main, master ]
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build:
     name: Build All Platforms
@@ -30,6 +35,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
           targetPlatform: WebGL
           outputPath: build/WebGL
@@ -41,6 +47,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
           targetPlatform: StandaloneWindows64
           outputPath: build/StandaloneWindows64
@@ -52,11 +59,12 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
           targetPlatform: Android
           outputPath: build/Android
 
-      # Upload Artifacts (Lưu trữ file để tải về - Đã cập nhật lên v4)
+      # Upload Artifacts (Lưu trữ file để tải về)
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
